@@ -73,7 +73,7 @@ export const generatePDFReceipt = async (req, res) => {
       .fontSize(24)
       .fillColor("#0d3b66")
       .font("Times-Bold")
-      .text("ASANAM DONATION RECEIPT 2025", 0, 150, { align: "center" });
+      .text("ASANAM DONATION RECEIPT 2026", 0, 150, { align: "center" });
 
     doc
       .fontSize(14)
@@ -213,7 +213,7 @@ export const generatePDFReceipt = async (req, res) => {
     doc
       .fontSize(8)
       .text(
-        "For queries, contact: stjohschurchmadathuvilai@gmail.com",
+        "For queries, contact: stjohnschurchmadathuvilai@gmail.com",
         0,
         800,
         {

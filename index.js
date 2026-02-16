@@ -7,7 +7,8 @@ import authRoutes from "./src/routes/authRoutes.js";
 import donationRouter from "./src/routes/donationRoutes.js";
 import exportRouter from "./src/routes/exportRoutes.js";
 import receiptRouter from "./src/routes/reciptRoutes.js";
-import pdfRouter from "./src/routes/pdfRotes.js";
+import pdfRouter from "./src/routes/pdfRoutes.js";
+import dashboardRoutes from "./src/routes/dashboardRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -16,9 +17,9 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/donations", donationRouter);
 app.use("/api/export", exportRouter);
-app.use("/api/receipt", receiptRouter);
+app.use("/api/print-receipt", receiptRouter);
 app.use("/api/pdf-receipt", pdfRouter);
-
+app.use("/api/dashboard", dashboardRoutes);
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {

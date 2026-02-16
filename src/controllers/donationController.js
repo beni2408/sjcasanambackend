@@ -50,47 +50,46 @@ export const addDonation = async (req, res) => {
 };
 
 export const getDonations = async (req, res) => {
-  try {
-    const { name, paymentMode, minAmount, maxAmount, sortBy, order } =
-      req.query;
+  const { name, receiptNumber, paymentMode, minAmount, maxAmount, sortBy, order } = req.query;
 
-    let filter = {};
+  let filter = {};
 
-    /* ✅ NAME FILTER */
-    if (name) {
-      filter.name = { $regex: name, $options: "i" }; // case-insensitive
-    }
-
-    /* ✅ PAYMENT MODE FILTER */
-    if (paymentMode) {
-      filter.paymentMode = paymentMode;
-    }
-
-    /* ✅ AMOUNT RANGE FILTER 💰 */
-    if (minAmount || maxAmount) {
-      filter.donated_amount = {};
-
-      if (minAmount) filter.donated_amount.$gte = Number(minAmount);
-      if (maxAmount) filter.donated_amount.$lte = Number(maxAmount);
-    }
-
-    /* ✅ SORTING LOGIC ⭐⭐⭐⭐⭐ */
-    let sort = {};
-
-    if (sortBy) {
-      sort[sortBy] = order === "asc" ? 1 : -1;
-    } else {
-      sort.createdAt = -1; // Default → Latest first
-    }
-
-    const donations = await donationModel.find(filter).sort(sort);
-
-    res.json(donations);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+  /* ✅ NAME FILTER */
+  if (name) {
+    filter.name = { $regex: name, $options: "i" };
   }
+
+  /* ✅ RECEIPT NUMBER FILTER */
+  if (receiptNumber) {
+    filter.receiptNumber = { $regex: receiptNumber, $options: "i" };
+  }
+
+  /* ✅ PAYMENT FILTER */
+  if (paymentMode) {
+    filter.paymentMode = paymentMode;
+  }
+
+  /* ✅ AMOUNT RANGE FILTER 💰🔥 */
+  if (minAmount || maxAmount) {
+    filter.donated_amount = {};
+
+    if (minAmount) filter.donated_amount.$gte = Number(minAmount);
+
+    if (maxAmount) filter.donated_amount.$lte = Number(maxAmount);
+  }
+
+  /* ✅ SORTING */
+  let sort = {};
+
+  if (sortBy) {
+    sort[sortBy] = order === "asc" ? 1 : -1;
+  } else {
+    sort.createdAt = -1;
+  }
+
+  const donations = await donationModel.find(filter).sort(sort);
+
+  res.json(donations);
 };
 
 export const updateDonation = async (req, res) => {
@@ -137,6 +136,26 @@ export const updateDonation = async (req, res) => {
     const updatedDonation = await donation.save();
 
     res.json(updatedDonation);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const deleteDonation = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const donation = await donationModel.findByIdAndDelete(id);
+
+    if (!donation) {
+      return res.status(404).json({
+        message: "Donation not found",
+      });
+    }
+
+    res.json({ message: "Donation deleted successfully" });
   } catch (error) {
     res.status(500).json({
       message: error.message,

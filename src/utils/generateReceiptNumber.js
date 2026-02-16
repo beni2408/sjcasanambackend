@@ -4,14 +4,13 @@ export const generateReceiptNumber = async () => {
   const year = new Date().getFullYear();
 
   const lastDonation = await donationModel
-    .findOne({ receiptNumber: { $regex: `SJC-${year}` } })
-    .sort({ createdAt: -1 });
+    .findOne({ receiptNumber: { $regex: `^SJC${year}` } })
+    .sort({ receiptNumber: -1 });
 
   let nextNumber = 1;
 
   if (lastDonation?.receiptNumber) {
-    const lastNumber = parseInt(lastDonation.receiptNumber.split("")[2]);
-
+    const lastNumber = parseInt(lastDonation.receiptNumber.replace(`SJC${year}`, ""));
     nextNumber = lastNumber + 1;
   }
 

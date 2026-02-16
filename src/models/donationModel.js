@@ -5,6 +5,7 @@ const donationSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      index: true,
     },
 
     address: {
@@ -23,6 +24,7 @@ const donationSchema = new mongoose.Schema(
     donated_amount: {
       type: Number,
       required: true,
+      index: true,
     },
 
     paymentMode: {
@@ -43,6 +45,7 @@ const donationSchema = new mongoose.Schema(
       // ⭐ NEW FIELD
       type: Date,
       required: true,
+      index: true,
     },
     receiptNumber: {
       type: String,
