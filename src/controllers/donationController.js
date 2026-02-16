@@ -1,4 +1,5 @@
 import donationModel from "../models/donationModel.js";
+import { generateReceiptNumber } from "../utils/generateReceiptnumber.js";
 
 export const addDonation = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ export const addDonation = async (req, res) => {
         message: "Transaction ID required for UPI payments",
       });
     }
-
+    const receiptNumber = await generateReceiptNumber();
     const donation = await donationModel.create({
       name,
       address,
@@ -37,6 +38,7 @@ export const addDonation = async (req, res) => {
       transactionId,
       description,
       donationDate,
+      receiptNumber, // ⭐ STORED
     });
 
     res.status(201).json(donation);

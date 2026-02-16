@@ -1,5 +1,6 @@
 import ExcelJS from "exceljs";
 import donationModel from "../models/donationModel.js";
+import { generateReceiptNumber } from "../utils/generateReceiptnumber.js";
 
 export const exportDonationsToExcel = async (req, res) => {
   try {

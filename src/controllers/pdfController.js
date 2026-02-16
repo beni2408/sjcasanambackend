@@ -1,6 +1,7 @@
 import PDFDocument from "pdfkit";
 import donationModel from "../models/donationModel.js";
 import https from "https";
+import { generateReceiptNumber } from "../utils/generateReceiptnumber.js";
 
 const fetchImage = (url) => {
   return new Promise((resolve, reject) => {
@@ -73,11 +74,14 @@ export const generatePDFReceipt = async (req, res) => {
       .fillColor("#0d3b66")
       .font("Times-Bold")
       .text("ASANAM DONATION RECEIPT 2025", 0, 150, { align: "center" });
+
     doc
-      .fontSize(11)
-      .fillColor("#6c757d")
-      .font("Helvetica")
-      .text(`Receipt ID: ${donation._id}`, 0, 180, { align: "center" });
+      .fontSize(14)
+      .fillColor("#212529")
+      .font("Helvetica-Bold")
+      .text(`Receipt No: ${donation.receiptNumber}`, 0, 185, {
+        align: "center",
+      });
     doc.fontSize(10).text(
       `Issued on: ${new Date().toLocaleDateString("en-IN", {
         day: "2-digit",
@@ -217,6 +221,11 @@ export const generatePDFReceipt = async (req, res) => {
           width: 595,
         }
       );
+    doc
+      .fontSize(9)
+      .fillColor("#6c757d")
+      .font("Helvetica")
+      .text(`Receipt ID: ${donation._id}`, 0, 820, { align: "center" });
 
     doc.end();
   } catch (error) {

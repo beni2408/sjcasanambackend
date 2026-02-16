@@ -44,6 +44,10 @@ const donationSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    receiptNumber: {
+      type: String,
+      unique: true,
+    },
   },
   { timestamps: true }
 );
