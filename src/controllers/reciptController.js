@@ -1,5 +1,78 @@
 import donationModel from "../models/donationModel.js";
 
+const numberToWords = (amount) => {
+  if (!amount) return "Zero Rupees";
+
+  const ones = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ];
+
+  const tens = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+
+  const numToWords = (num) => {
+    if (num < 20) return ones[num];
+    if (num < 100) return tens[Math.floor(num / 10)] + " " + ones[num % 10];
+    if (num < 1000)
+      return ones[Math.floor(num / 100)] + " Hundred " + numToWords(num % 100);
+    if (num < 100000)
+      return (
+        numToWords(Math.floor(num / 1000)) +
+        " Thousand " +
+        numToWords(num % 1000)
+      );
+    if (num < 10000000)
+      return (
+        numToWords(Math.floor(num / 100000)) +
+        " Lakh " +
+        numToWords(num % 100000)
+      );
+
+    return (
+      numToWords(Math.floor(num / 10000000)) +
+      " Crore " +
+      numToWords(num % 10000000)
+    );
+  };
+
+  const [rupees, paise] = amount.toString().split(".");
+
+  let words = `${numToWords(parseInt(rupees))} `;
+
+  if (paise) words += ` and ${numToWords(parseInt(paise))} Paise`;
+
+  return words.trim();
+};
+
 export const generateReceipt = async (req, res) => {
   try {
     const { id } = req.params;
@@ -42,7 +115,28 @@ export const generateReceipt = async (req, res) => {
             .info-col { flex: 1; }
             .info-label { font-size: 12px; color: #6c757d; margin-bottom: 8px; }
             .info-value { font-size: 18px; color: #212529; font-weight: bold; }
-            .amount-box { background: #0d3b66; color: #faa307; padding: 12px 20px; border-radius: 5px; display: inline-block; font-size: 26px; font-weight: bold; }
+           .amount-box {
+  border: 1.5px solid #c62828;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #fff;
+}
+
+.amount-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #c62828;
+}
+
+.amount-words {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
             .thank-box { margin: 0 40px 25px; background: #e7f5ff; border-radius: 8px; padding: 22px; text-align: center; }
             .thank-box h3 { font-size: 20px; color: #0d3b66; font-weight: bold; margin-bottom: 8px; }
             .thank-box p { font-size: 13px; color: #495057; }
@@ -72,7 +166,10 @@ export const generateReceipt = async (req, res) => {
           </div>
           <div class="divider"></div>
           <div class="title">
-            <h2>ASANAM DONATION RECEIPT 2026</h2>
+      
+          
+          <h2> 132 nd ASANAM FESTIVAL 2026</h2>
+    
             <div class="receipt-no">Receipt No: ${donation.receiptNumber}</div>
             <div class="issued">Issued on: ${new Date().toLocaleDateString(
               "en-IN",
@@ -103,10 +200,21 @@ export const generateReceipt = async (req, res) => {
                   <div class="info-label">Payment Method</div>
                   <div class="info-value">${paymentMethod}</div>
                 </div>
-                <div class="info-col">
-                  <div class="info-label">Amount Donated</div>
-                  <div class="amount-box">Rs. ${donation.donated_amount}</div>
-                </div>
+              <div class="info-col">
+  <div class="info-label">Amount Donated</div>
+ <div class="amount-box">
+  <div class="amount-value">
+    Rs. ${donation.donated_amount}
+  </div>
+
+  <div class="amount-words">
+
+  [Rupees  ${numberToWords(donation.donated_amount)} Only]
+  </div>
+</div>
+
+</div>
+                
               </div>
             </div>
           </div>
