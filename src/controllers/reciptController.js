@@ -115,47 +115,87 @@ export const generateReceipt = async (req, res) => {
             .info-col { flex: 1; }
             .info-label { font-size: 12px; color: #6c757d; margin-bottom: 8px; }
             .info-value { font-size: 18px; color: #212529; font-weight: bold; }
-           .amount-box {
-  border: 1.5px solid #c62828;
-  border-radius: 8px;
-  padding: 10px 16px;
-  background: #fff;
-}
 
-.amount-value {
-  font-size: 22px;
-  font-weight: 800;
-  color: #c62828;
-}
+            .amount-box {
+              border: 1.5px solid #c62828;
+              border-radius: 8px;
+              padding: 10px 16px;
+              background: #fff;
+            }
 
-.amount-words {
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 900;
-  color: #777;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-}
+            .amount-value {
+              font-size: 22px;
+              font-weight: 800;
+              color: #c62828;
+            }
+
+            .amount-words {
+              margin-top: 8px;
+              font-size: 14px;
+              font-weight: 900;
+              color: #777;
+              text-transform: uppercase;
+              letter-spacing: 0.6px;
+            }
 
             .thank-box { margin: 0 40px 25px; background: #e7f5ff; border-radius: 8px; padding: 22px; text-align: center; }
             .thank-box h3 { font-size: 20px; color: #0d3b66; font-weight: bold; margin-bottom: 8px; }
             .thank-box p { font-size: 13px; color: #495057; }
-            .signature-section { margin: 0 40px 25px; display: flex; justify-content: space-between; align-items: flex-end; }
-            .sig-left p { font-size: 12px; color: #495057; font-weight: bold; margin-bottom: 5px; }
-            .sig-left h4 { font-size: 13px; color: #212529; }
-            .sig-right { text-align: center; }
-            .sig-img { width: 140px; height: auto; margin-bottom: 10px; }
-            .sig-line { width: 140px; height: 1.5px; background: #495057; margin: 10px 0; }
-            .sig-text { font-size: 11px; color: #6c757d; }
+
+            /* ✅ UPDATED SIGNATURE SECTION */
+.signature-section {
+  margin: 0 40px 25px;
+  display: flex;
+  justify-content: space-between;   /* ✅ Push to edges */
+  align-items: flex-end;
+}
+
+.sig-block {
+  width: 180px;   /* ✅ Fixed width for stable alignment */
+  text-align: center;
+}
+
+.sig-img {
+  width: 70px;
+  height: auto;
+  margin-bottom: 6px;
+}
+
+.sig-line {
+  width: 110px;
+  height: 1.5px;
+  background: #495057;
+  margin: 6px auto;
+}
+
+.sig-label {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+.sig-title {
+  font-size: 13px;
+  color: #212529;
+  font-weight: bold;
+}
+
+
             .footer-divider { height: 3px; background: #faa307; }
             .footer { background: #f8f9fa; padding: 20px; text-align: center; }
             .footer p { font-size: 11px; color: #6c757d; margin: 5px 0; }
             .footer small { font-size: 10px; color: #adb5bd; display: block; margin: 3px 0; }
-            @media print { body { margin: 0; } @page { margin: 0; size: A4; } html, body { width: 210mm; height: 297mm; } }
+
+            @media print {
+              body { margin: 0; }
+              @page { margin: 0; size: A4; }
+              html, body { width: 210mm; height: 297mm; }
+            }
           </style>
         </head>
+
         <body onload="window.print()">
           <div class="content">
+
           <div class="header">
             <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771231215/SJC_app_logo-2-SJC_reciept_web_logo_2_ww8vbk.png" class="logo" />
             <div class="header-text">
@@ -164,26 +204,28 @@ export const generateReceipt = async (req, res) => {
               <small>stjohnschurchmadadthuvilai@gmail.com | +91 9865384841</small>
             </div>
           </div>
+
           <div class="divider"></div>
+
           <div class="title">
-      
-          
-          <h2> 132 nd ASANAM FESTIVAL 2026</h2>
-    
+            <h2>132 nd ASANAM FESTIVAL 2026</h2>
             <div class="receipt-no">Receipt No: ${donation.receiptNumber}</div>
             <div class="issued">Issued on: ${new Date().toLocaleDateString(
               "en-IN",
               { day: "2-digit", month: "long", year: "numeric" }
             )}</div>
           </div>
+
           <div class="info-box">
             <div class="info-header">DONOR INFORMATION</div>
             <div class="info-content">
+
               <div class="info-row">
                 <div class="info-col">
                   <div class="info-label">Donor Name</div>
                   <div class="info-value">${donation.name}</div>
                 </div>
+
                 <div class="info-col">
                   <div class="info-label">Donation Date</div>
                   <div class="info-value">${new Date(
@@ -195,52 +237,66 @@ export const generateReceipt = async (req, res) => {
                   })}</div>
                 </div>
               </div>
+
               <div class="info-row" style="margin-bottom: 0;">
                 <div class="info-col">
                   <div class="info-label">Payment Method</div>
                   <div class="info-value">${paymentMethod}</div>
                 </div>
-              <div class="info-col">
-  <div class="info-label">Amount Donated</div>
- <div class="amount-box">
-  <div class="amount-value">
-    Rs. ${donation.donated_amount}
-  </div>
 
-  <div class="amount-words">
+                <div class="info-col">
+                  <div class="info-label">Amount Donated</div>
+                  <div class="amount-box">
+                    <div class="amount-value">
+                      Rs. ${donation.donated_amount}
+                    </div>
 
-  [Rupees  ${numberToWords(donation.donated_amount)} Only]
-  </div>
-</div>
-
-</div>
-                
+                    <div class="amount-words">
+                      [Rupees ${numberToWords(donation.donated_amount)} Only]
+                    </div>
+                  </div>
+                </div>
               </div>
+
             </div>
           </div>
+
           <div class="thank-box">
             <h3>Thank You for Your Generous Support!</h3>
             <p>Your contribution helps us serve the community better.</p>
           </div>
-          <div class="signature-section">
-            <div class="sig-left">
-              <p>Authorized By:</p>
-              <h4>LCF Secretary</h4>
-            </div>
-            <div class="sig-right">
-              <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771228173/IMG_8382_2_raytz3.jpg" class="sig-img" />
-              <div class="sig-line"></div>
-              <div class="sig-text">Authorized Signature</div>
-            </div>
+
+          <!-- ✅ UPDATED SIGNATURE HTML -->
+<div class="signature-section">
+
+  <div class="sig-block">
+    <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771302430/SJC_app_logo-4-GRP_Sign_za89hs.png" class="sig-img" />
+    <div class="sig-line"></div>
+    <div class="sig-label">Authorized By</div>
+    <div class="sig-title">LCF Secretary</div>
+  </div>
+
+  <div class="sig-block">
+    <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771302430/SJC_app_logo-3-Ishiah_Signature_qaoomm.png" class="sig-img" />
+    <div class="sig-line"></div>
+    <div class="sig-label">Authorized By</div>
+    <div class="sig-title">LCF Treasurer</div>
+  </div>
+
+</div>
+
+
           </div>
-          </div>
+
           <div class="footer-divider"></div>
+
           <div class="footer">
             <p>This is a computer-generated receipt and does not require a physical signature.</p>
             <small>St. John's Church, Madathuvilai</small>
             <small>For queries, contact: stjohschurchmadathuvilai@gmail.com</small>
             <small style="margin-top: 10px;">Receipt ID: ${donation._id}</small>
           </div>
+
         </body>
       </html>
     `);
