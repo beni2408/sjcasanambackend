@@ -50,7 +50,68 @@ import axios from "axios";
 //   }
 // };
 
+// n8n + backend node
+// export const addDonation = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       address,
+//       phone,
+//       email,
+//       donated_amount,
+//       paymentMode,
+//       transactionId,
+//       description,
+//       donationDate,
+//     } = req.body;
+
+//     if (!name || !address || !donated_amount || !paymentMode || !donationDate) {
+//       return res.status(400).json({
+//         message: "Missing required fields",
+//       });
+//     }
+
+//     if (paymentMode === "UPI" && !transactionId) {
+//       return res.status(400).json({
+//         message: "Transaction ID required for UPI payments",
+//       });
+//     }
+
+//     const receiptNumber = await generateReceiptNumber();
+
+//     const donation = await donationModel.create({
+//       name,
+//       address,
+//       phone,
+//       email,
+//       donated_amount,
+//       paymentMode,
+//       transactionId,
+//       description,
+//       donationDate,
+//       receiptNumber,
+//     });
+
+//     /* ⭐⭐⭐⭐⭐ SYNC TO SHEETS ⭐⭐⭐⭐⭐ */
+//     axios
+//       .post("http://127.0.0.1:5678/webhook/data-entry", {
+//         donation, // ✅ wrapped payload (important)
+//       })
+//       .catch((err) => {
+//         console.log("❌ n8n ERROR →", err.message);
+//       });
+
+//     res.status(201).json(donation);
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message,
+//     });
+//   }
+// };
+
+// full n8n based!
 export const addDonation = async (req, res) => {
+  console.log("📩 Incoming Body →", req.body);
   try {
     const {
       name,
@@ -58,19 +119,27 @@ export const addDonation = async (req, res) => {
       phone,
       email,
       donated_amount,
-      paymentMode,
+      paymentmethod, // ✅ correct field
       transactionId,
       description,
       donationDate,
     } = req.body;
 
-    if (!name || !address || !donated_amount || !paymentMode || !donationDate) {
+    // ✅ Correct validation
+    if (
+      !name ||
+      !address ||
+      !donated_amount ||
+      !paymentmethod ||
+      !donationDate
+    ) {
       return res.status(400).json({
         message: "Missing required fields",
       });
     }
 
-    if (paymentMode === "UPI" && !transactionId) {
+    // ✅ Correct UPI validation
+    if (paymentmethod === "UPI" && !transactionId) {
       return res.status(400).json({
         message: "Transaction ID required for UPI payments",
       });
@@ -78,30 +147,30 @@ export const addDonation = async (req, res) => {
 
     const receiptNumber = await generateReceiptNumber();
 
-    const donation = await donationModel.create({
+    const donationPayload = {
       name,
       address,
       phone,
       email,
       donated_amount,
-      paymentMode,
+      paymentmethod, // ✅ now will never be null
       transactionId,
       description,
       donationDate,
       receiptNumber,
+    };
+
+    await axios.post("http://127.0.0.1:5678/webhook/data-entry", {
+      donation: donationPayload,
     });
 
-    /* ⭐⭐⭐⭐⭐ SYNC TO SHEETS ⭐⭐⭐⭐⭐ */
-    axios
-      .post("http://127.0.0.1:5678/webhook/data-entry", {
-        donation, // ✅ wrapped payload (important)
-      })
-      .catch((err) => {
-        console.log("❌ n8n ERROR →", err.message);
-      });
-
-    res.status(201).json(donation);
+    res.status(201).json({
+      message: "Donation sent to automation workflow",
+      donation: donationPayload,
+    });
   } catch (error) {
+    console.log("❌ Controller Error →", error.message);
+
     res.status(500).json({
       message: error.message,
     });
@@ -219,9 +288,12 @@ export const getDonations = async (req, res) => {
 //     });
 // };
 
+// normal updation plus n8n google sheets updation
 export const updateDonation = async (req, res) => {
   try {
     const { id } = req.params;
+
+    console.log("UPDATE ID →", id);
 
     const donation = await donationModel.findById(id);
 
@@ -243,25 +315,49 @@ export const updateDonation = async (req, res) => {
       donationDate,
     } = req.body;
 
-    if (paymentMode === "UPI" && !transactionId) {
+    /* ⭐⭐⭐⭐⭐ SANITIZE INPUTS ⭐⭐⭐⭐⭐ */
+
+    // Fix whitespace enum crash
+    const cleanPaymentMode = paymentMode?.trim();
+
+    if (cleanPaymentMode === "UPI" && !transactionId) {
       return res.status(400).json({
         message: "Transaction ID required for UPI payments",
       });
     }
 
-    donation.name = name ?? donation.name;
-    donation.address = address ?? donation.address;
-    donation.phone = phone ?? donation.phone;
-    donation.email = email ?? donation.email;
-    donation.donated_amount = donated_amount ?? donation.donated_amount;
-    donation.paymentMode = paymentMode ?? donation.paymentMode;
-    donation.transactionId = transactionId ?? donation.transactionId;
-    donation.description = description ?? donation.description;
-    donation.donationDate = donationDate ?? donation.donationDate;
+    /* ⭐⭐⭐⭐⭐ SAFE FIELD UPDATES ⭐⭐⭐⭐⭐ */
+
+    if (name !== undefined) donation.name = name;
+    if (address !== undefined) donation.address = address;
+    if (phone !== undefined) donation.phone = phone;
+    if (email !== undefined) donation.email = email;
+
+    // Prevent Number casting crash
+    if (donated_amount !== undefined && donated_amount !== "") {
+      donation.donated_amount = Number(donated_amount);
+    }
+
+    if (cleanPaymentMode !== undefined) {
+      donation.paymentMode = cleanPaymentMode;
+    }
+
+    if (transactionId !== undefined) {
+      donation.transactionId = transactionId;
+    }
+
+    if (description !== undefined) {
+      donation.description = description;
+    }
+
+    if (donationDate !== undefined) {
+      donation.donationDate = donationDate;
+    }
 
     const updatedDonation = await donation.save();
 
-    /* ⭐ SYNC UPDATE TO n8n */
+    /* ⭐⭐⭐⭐⭐ SYNC UPDATE TO n8n ⭐⭐⭐⭐⭐ */
+
     axios
       .post("http://127.0.0.1:5678/webhook/data-update", {
         action: "UPDATE",
@@ -273,11 +369,79 @@ export const updateDonation = async (req, res) => {
 
     res.json(updatedDonation);
   } catch (error) {
+    console.log("❌ FULL UPDATE ERROR →", error);
+
     res.status(500).json({
       message: error.message,
     });
   }
 };
+
+// fully automated using n8n -
+
+// export const updateDonation = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const {
+//       name,
+//       address,
+//       phone,
+//       email,
+//       donated_amount,
+//       paymentMode,
+//       transactionId,
+//       description,
+//       donationDate,
+//       receiptNumber,
+//     } = req.body;
+
+//     if (!receiptNumber) {
+//       return res.status(400).json({
+//         message: "Receipt Number is required for update",
+//       });
+//     }
+
+//     if (paymentMode === "UPI" && !transactionId) {
+//       return res.status(400).json({
+//         message: "Transaction ID required for UPI payments",
+//       });
+//     }
+
+//     const updatePayload = {
+//       id,
+//       receiptNumber,
+//       name,
+//       address,
+//       phone,
+//       email,
+//       donated_amount,
+
+//       /* ⭐⭐⭐⭐⭐ FIXED FIELD ⭐⭐⭐⭐⭐ */
+//       paymentmethod: paymentMode,
+
+//       transactionId,
+//       description,
+//       donationDate,
+//     };
+
+//     await axios.post("http://127.0.0.1:5678/webhook-test/data-update", {
+//       action: "UPDATE",
+//       donation: updatePayload,
+//     });
+
+//     res.json({
+//       message: "Donation update sent to automation workflow",
+//       donation: updatePayload,
+//     });
+//   } catch (error) {
+//     console.log("❌ Update Controller Error →", error.message);
+
+//     res.status(500).json({
+//       message: error.message,
+//     });
+//   }
+// };
 
 // export const deleteDonation = async (req, res) => {
 //   try {
@@ -313,7 +477,7 @@ export const deleteDonation = async (req, res) => {
 
     /* ⭐⭐⭐⭐⭐ SYNC DELETE TO SHEETS ⭐⭐⭐⭐⭐ */
     axios
-      .post("http://127.0.0.1:5678/webhook/data-delete", {
+      .post("http://127.0.0.1:5678/webhook-test/data-delete", {
         action: "DELETE",
         donation,
       })
