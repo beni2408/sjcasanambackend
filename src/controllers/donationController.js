@@ -477,7 +477,7 @@ export const deleteDonation = async (req, res) => {
 
     /* ⭐⭐⭐⭐⭐ SYNC DELETE TO SHEETS ⭐⭐⭐⭐⭐ */
     axios
-      .post("http://127.0.0.1:5678/webhook-test/data-delete", {
+      .post("http://127.0.0.1:5678/webhook/data-delete", {
         action: "DELETE",
         donation,
       })
