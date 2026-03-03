@@ -76,7 +76,6 @@ const numberToWords = (amount) => {
 export const generateReceipt = async (req, res) => {
   try {
     const { id } = req.params;
-
     const donation = await donationModel.findById(id);
 
     if (!donation) {
@@ -89,356 +88,361 @@ export const generateReceipt = async (req, res) => {
         : donation.paymentMode.toUpperCase();
 
     res.send(`
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mukta+Malar:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mukta+Malar:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>ரசீது</title>
 
-    <!-- ✅ PROFESSIONAL FONT -->
-    <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <title>ரசீது</title>
-
-    <style>
+<style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-      body {
-        font-family: 'Mukta Malar', sans-serif;
-        width: 595px;
-        height: 842px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-      }
+body {
+  font-family: 'Mukta Malar', 'Inter', sans-serif;
+  margin: 0;
+}
 
-      .content { flex: 1; }
+@page {
+  size: A4;
+  margin: 0;
+}
 
-      .header {
-        background: #0d3b66;
-        height: 170px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 40px;
-      }
+.half-page {
+  height: 148.5mm;
+  border-bottom: 2px dashed #999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+}
 
-      .logo { width: 100px; height: 100px; }
-      .logo2 { width: 70px; height: 70px;  }
+.content {
+  width: 210mm; /* A4 width */
+  transform: scale(0.92); /* makes everything fit perfectly inside half */
+  transform-origin: top center;
+  display: flex;
+  flex-direction: column;
+  min-height: 148.5mm;
+}
 
-      .header-text {
-        color: white;
-        display:flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-      }
+.header {
+  background: linear-gradient(135deg, #0d3b66 0%, #1a5490 100%);
+  padding: 12px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  height : 130px;
+  
+}
 
-      .header-text h1 {
-        font-size: 30px;
-        font-weight: bold;
-        
-      }
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #faa307 0%, #f48c06 100%);
+}
 
-      .header-text p { font-size: 15px; margin: 1px 0; }
-      .header-text small { font-size: 12px; }
+.logo { width: 85px; height: 85px; }
+.logo2 { width: 75px; height: 75px; }
 
-      .divider { height: 3px; background: #faa307; }
+.header-text {
+  color: white;
+  text-align: center;
+  flex: 1;
+  margin: 0 15px;
+}
 
-      .title { text-align: center; padding-top: 5px; }
+.header-text h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 2px 0;
+}
 
-      .title h2 {
-        font-size: 28px;
-        color: #0d3b66;
-        font-weight: bold;
-        margin-bottom: 10px;
-        
-      }
+.header-text p { font-size: 11px; margin: 2px 0; opacity: 0.9; }
+.header-text small { font-size: 10px; opacity: 0.85; }
 
-      .title .receipt-no {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 5px;
-        font-family: 'Courier New', Courier, monospace;
-      }
+.title { 
+  text-align: center; 
+  padding: 8px 15px;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  margin: 10px 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-      .title .issued {
-        font-size: 12px;
-        color: #666;
-        font-family: 'Courier New', Courier, monospace;
-      }
+.title h2 {
+  font-size: 18px;
+  color: #0d3b66;
+  font-weight: 700;
+  
+}
 
-      .info-box {
-        margin: 25px 40px;
-        border: 2px solid rgba(13, 59, 102, 0.2);
-        border-radius: 8px;
-        overflow: hidden;
-      }
+.title .receipt-no {
+  font-size: 10px;
+  font-weight: 500;
+font-family: 'Roboto Mono', monospace;
+  color: grey;
+}
 
-      .info-header {
-        background: #f1f3f5;
-        padding: 12px 20px;
-        font-size: 14px;
-        font-weight: 600;
-      }
+.title .issued {
+  font-size: 10px;
+  font-weight: 500;
+  color: grey;
+  font-family: 'Roboto Mono', monospace;
+}
 
-      .info-content { padding: 25px 20px; }
+.info-box {
+  margin: 10px 30px;
+  border: 1.5px solid #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+}
 
-      .info-row { display: flex; margin-bottom: 28px; }
+.info-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 8px 15px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #faa307;
+}
 
-      .info-col { flex: 1; }
+.info-content { padding: 12px 15px; }
 
-      .info-label {
-        font-size: 12px;
-        color: #6c757d;
-        margin-bottom: 8px;
-      }
+.info-row { display: flex; margin-bottom: 12px; }
 
-      .info-value {
-        font-size: 18px;
-        font-weight: 600;
-      }
+.info-col { flex: 1; }
 
-      .amount-box {
-        border: 1.5px solid #c62828;
-        border-radius: 8px;
-        padding: 10px 16px;
-        background: #fff;
-      }
+.info-label {
+  font-size: 10px;
+  color: #868e96;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.info-label2 {
+  font-size: 10px;
+  color: #868e96;
 
-      .amount-value {
-        font-size: 22px;
-        font-weight: 700;
-        color: #c62828;
-      }
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-      .amount-words {
-        margin-top: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #777;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-      }
+.info-value {
+  font-size: 14px;
+  font-weight: 600;
+}
 
-      .thank-box {
-        margin: 0 40px 25px;
-        background: #e7f5ff;
-        border-radius: 8px;
-        padding: 22px;
-        
-      }
+.amount-box {
+  // border: 2px solid #c62828;
+  border-radius: 8px;
+  
+  // background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+  height: 60px;
+  display: flex;
+  flex-direction: column;
 
-      .thank-box h3 {
-        font-size: 20px;
-        color: #0d3b66;
-        margin-bottom: 6px;
-        text-align: center;
-      }
+  align-items : center;
 
-      .thank-box p {
-        font-size: 13px;
-        color: #495057;
-        text-align: end;
-      }
+}
 
-      .signature-section {
-        margin: 0 40px 25px;
-        display: flex;
-        justify-content: end;
-        align-items: flex-end;
-      }
+.amount-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #c62828;
+}
 
-      .sig-block {
-        width: 120px;
-        text-align: center;
-      }
-
-      .sig-img {
-        width: 70px;
-        margin-bottom: 6px;
-      }
-
-      .sig-line {
-        width: 110px;
-        height: 1.5px;
-        background: #495057;
-        margin: 6px auto;
-      }
-
-      .sig-label {
-        font-size: 11px;
-        color: #6c757d;
-      }
-
-      .sig-title {
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .footer-divider { height: 3px; background: #faa307; }
-
-      .footer {
-        background: #f8f9fa;
-        padding: 20px;
-        text-align: center;
-      }
-
-      .footer p {
-        font-size: 11px;
-        color: #6c757d;
-        margin: 5px 0;
-      }
-
-      .footer small {
-        font-size: 10px;
-        color: #adb5bd;
-        display: block;
-        margin: 3px 0;
-      }
-
-      .sup-text {
-        font-size: 55%;
-        vertical-align: super;
-        font-weight: 600;
-      }
-        .ungal{
-        text-align: center;
-        justify-content: center;
-        align-items: center;
-        color: #0d3b66;
-        margin-bottom: 20px;
-        }
-
-      @media print {
-        body { margin: 0; }
-        @page { margin: 0; size: A4; }
-        html, body { width: 210mm; height: 297mm; }
-      }
-    </style>
-  </head>
-
-  <body onload="window.print()">
-    <div class="content">
-
-      <div class="header">
-        <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771417669/SJC_app_logo-2-SJC_reciept_web_logo_5_nysuyc.png" class="logo" />
-
-        <div class="header-text">
-        <p>தூத்துக்குடி – நாசரேத் திருமண்டலம், மடத்துவிளை சேகரம்</p>
-          <h1>தூய யோவான் ஆலயம் </h1>
-          <h1>பரிபாலன கமிட்டி</h1>
-          <small>stjohnschurchmadadthuvilai@gmail.com | +91 9865384841</small>
-        </div>
-
-        <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771409834/CSI_Logo.1b40b3e0_1_bjpldd.png" class="logo2"/>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="title">
-        <h2>
-          132<span class="sup-text">வது</span>அசன பண்டிகை 2026
-        </h2>
-
-        <div class="receipt-no">ரசீது எண்: ${donation.receiptNumber}</div>
-
-        <div class="issued">
-          வழங்கப்பட்ட தேதி:
-          ${new Date().toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          })}
-        </div>
-      </div>
-
-      <div class="info-box">
-        <div class="info-header">நன்கொடையாளர் தகவல்</div>
-
-        <div class="info-content">
-
-          <div class="info-row">
-            <div class="info-col">
-              <div class="info-label">நன்கொடையாளரின் பெயர்</div>
-              <div class="info-value">${donation.name}</div>
-            </div>
-
-            <div class="info-col">
-              <div class="info-label">தேதி</div>
-              <div class="info-value">
-                ${new Date(donation.donationDate).toLocaleDateString("en-IN", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div class="info-row" style="margin-bottom: 0;">
-            <div class="info-col">
-              <div class="info-label">பணம் செலுத்தும் முறை</div>
-              <div class="info-value">${paymentMethod}</div>
-            </div>
-
-            <div class="info-col">
-              <div class="info-label">தொகை</div>
-
-              <div class="amount-box">
-                <div class="amount-value">
-                  ₹ ${donation.donated_amount}
-                </div>
-
-                <div class="amount-words">
-                  [ரூபாய் ${numberToWords(donation.donated_amount)} மட்டும்]
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="thank-box">
-      <h3>நீங்கள் இப்பொழுது இருக்கிறதைப் பார்க்கிலும் ஆயிரமடங்கு அதிகமாகும்படி கர்த்தர் உங்களை ஆசீர்வதிப்பாராக. </br>~ உபா 1:11</h3>
-      <p></p>
-      
-      </div>
-                  <h3 class="ungal">உங்கள் அன்பான ஆதரவிற்கு நன்றி!</h3>
-      <div class="signature-section">
-
-        <div class="sig-block">
-          <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771302430/SJC_app_logo-4-GRP_Sign_za89hs.png" class="sig-img" />
+.amount-words {
  
+  font-size: 9px;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+  maargin-top: -2px;
+}
 
-          <div class="sig-title">LCF செயலாளர்</div>
-        </div>
+.thank-box {
+  margin: 0 30px 8px;
+  background: linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%);
+  border-radius: 8px;
+  padding: 10px;
+  border-left: 4px solid #0d3b66;
+}
 
-        <div class="sig-block">
-          <img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771302430/SJC_app_logo-3-Ishiah_Signature_qaoomm.png" class="sig-img" />
+.thank-box h3 {
+  font-size: 11px;
+  color: #0d3b66;
+  text-align: center;
+  line-height: 1.4;
+  font-weight: 500;
+  margin: 0;
+}
 
-          <div class="sig-title">LCF பொருளாளர்</div>
-        </div>
+.ungal{
+  text-align: center;
+  color: #0d3b66;
+  margin: 8px 0;
+  font-size: 14px;
+  font-weight: 700;
+}
 
-      </div>
+.signature-section {
+  margin: 0 30px 8px;
+  display: flex;
+  justify-content: end;
+  align-items: flex-end;
+  gap:20px;
+}
 
-    </div>
+.sig-block {
+  text-align: center;
+  margin: 0;
+}
 
-    <div class="footer-divider"></div>
+.sig-img {
+  width: 55px;
+  margin-bottom: 4px;
+}
 
-    <div class="footer">
-      <p>இது கணினி மூலம் உருவாக்கப்பட்ட ரசீது; கைச்சாத்து தேவையில்லை.</p>
-      <small>தூய யோவான் ஆலயம் பரிபாலன கமிட்டி, மடத்துவிளை</small>
-      <small>வினவல்கள்: stjohnschurchmadadthuvilai@gmail.com</small>
-      <small style="margin-top: 10px;">ரசீது ஐடி: ${donation._id}</small>
-    </div>
+.sig-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: #495057;
+}
 
-  </body>
+.footer {
+  background: #f8f9fa;
+  padding: 8px;
+  text-align: center;
+  border-top: 2px solid #faa307;
+  margin-top: auto;
+}
+
+.footer p {
+  font-size: 9px;
+  color: #6c757d;
+  margin: 2px 0;
+}
+
+.footer .receipt-id {
+  font-size: 8px;
+  color: #adb5bd;
+  margin-top: 3px;
+}
+
+.sup-text {
+  font-size: 60%;
+  vertical-align: super;
+}
+</style>
+</head>
+
+<body>
+
+<div class="half-page">
+<div class="content">
+
+<div class="header">
+<img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771417669/SJC_app_logo-2-SJC_reciept_web_logo_5_nysuyc.png" class="logo" />
+<div class="header-text">
+<p>தூத்துக்குடி – நாசரேத் திருமண்டலம், மடத்துவிளை சேகரம்</p>
+<h1>தூய யோவான் ஆலயம்</h1>
+<h1>பரிபாலன கமிட்டி</h1>
+<small>stjohnschurchmadadthuvilai@gmail.com | +91 9865384841</small>
+</div>
+<img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771409834/CSI_Logo.1b40b3e0_1_bjpldd.png" class="logo2"/>
+</div>
+
+<div class="title">
+<div class="receipt-no">ரசீது எண்: ${donation.receiptNumber}</div>
+<h2>132<span class="sup-text">வது</span> அசன பண்டிகை 2026</h2>
+<div class="issued">வழங்கப்பட்ட தேதி: ${new Date().toLocaleDateString(
+      "en-IN"
+    )}</div>
+</div>
+
+<div class="info-box">
+<div class="info-header">நன்கொடையாளர் தகவல்</div>
+<div class="info-content">
+
+<div class="info-row">
+<div class="info-col">
+<div class="info-label">பெயர்</div>
+<div class="info-value">${donation.name}</div>
+</div>
+<div class="info-col">
+<div class="info-label">நன்கொடை தேதி</div>
+<div class="info-value">${new Date(donation.donationDate).toLocaleDateString(
+      "en-IN"
+    )}</div>
+</div>
+<div class="info-col">
+<div class="info-label">செலுத்தும் முறை</div>
+<div class="info-value">${paymentMethod}</div>
+
+</div>
+
+<div class="amount-box">
+  <div class="info-label2">செலுத்தும் முறை</div>
+    <div class="amount-value">₹ ${donation.donated_amount}</div>
+      <div class="amount-words">ரூபாய் ${numberToWords(
+        donation.donated_amount
+      )}  மட்டும்</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+<div class="thank-box">
+<h3>நீங்கள் இப்பொழுது இருக்கிறதைப் பார்க்கிலும் ஆயிரமடங்கு அதிகமாகும்படி கர்த்தர் உங்களை ஆசீர்வதிப்பாராக. ~ உபா 1:11</h3>
+</div>
+
+<h3 class="ungal">உங்கள் அன்பான ஆதரவிற்கு நன்றி!</h3>
+
+<div class="signature-section">
+<div class="sig-block">
+<img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771302430/SJC_app_logo-4-GRP_Sign_za89hs.png" class="sig-img" />
+<div class="sig-title">LCF செயலாளர்</div>
+</div>
+<div class="sig-block">
+<img src="https://res.cloudinary.com/dusji1fg2/image/upload/v1771302430/SJC_app_logo-3-Ishiah_Signature_qaoomm.png" class="sig-img" />
+<div class="sig-title">LCF பொருளாளர்</div>
+</div>
+</div>
+
+<div class="footer">
+<p>இது கணினி மூலம் உருவாக்கப்பட்ட ரசீது;</p>
+<p>தூய யோவான் ஆலயம் பரிபாலன கமிட்டி, மடத்துவிளை</p>
+<div class="receipt-id">ID: ${donation._id}</div>
+</div>
+
+</div>
+</div>
+
+<script>
+window.addEventListener("load", function() {
+  setTimeout(() => {
+    window.print();
+  }, 400);
+});
+</script>
+
+</body>
 </html>
-
-
-    `);
+`);
   } catch (error) {
     res.status(500).send(error.message);
   }
