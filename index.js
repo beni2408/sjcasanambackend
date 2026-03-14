@@ -10,6 +10,7 @@ import receiptRouter from "./src/routes/reciptRoutes.js";
 import pdfRouter from "./src/routes/pdfRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
 import emailRouter from "./src/routes/emailRoutes.js";
+import customEmailRouter from "./src/routes/customEmailRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use("/api/print-receipt", receiptRouter);
 app.use("/api/pdf-receipt", pdfRouter);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/send-email", emailRouter);
+app.use("/api/send-custom-email", customEmailRouter);
 
 const PORT = process.env.PORT || 5000;
 
