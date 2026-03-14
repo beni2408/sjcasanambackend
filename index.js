@@ -9,6 +9,7 @@ import exportRouter from "./src/routes/exportRoutes.js";
 import receiptRouter from "./src/routes/reciptRoutes.js";
 import pdfRouter from "./src/routes/pdfRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
+import emailRouter from "./src/routes/emailRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,8 @@ app.use("/api/export", exportRouter);
 app.use("/api/print-receipt", receiptRouter);
 app.use("/api/pdf-receipt", pdfRouter);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/send-email", emailRouter);
+
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
