@@ -160,8 +160,10 @@ export const addDonation = async (req, res) => {
       receiptNumber,
     };
 
-    await axios.post("http://127.0.0.1:5678/webhook/data-entry", {
+    await axios.post("http://127.0.0.1:5678/webhook-test/data-entry", {
       donation: donationPayload,
+      action: "CREATE",
+      sendReceipt: true,
     });
 
     res.status(201).json({
@@ -362,6 +364,7 @@ export const updateDonation = async (req, res) => {
       .post("http://127.0.0.1:5678/webhook/data-update", {
         action: "UPDATE",
         donation: updatedDonation,
+        sendReceipt: true,
       })
       .catch((err) => {
         console.log("❌ n8n UPDATE ERROR →", err.message);
